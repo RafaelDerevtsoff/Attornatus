@@ -2,28 +2,26 @@ package com.example.demo.entities;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String logradouro;
-    private Long CEP;
+    private Long cep;
     private Long numero;
 
     private String cidade;
     private boolean isPrincipal;
-    @ManyToOne
-    @JoinColumn(name = "email")
-    private Person pessoa;
 
-    public Address(String logradouro, Long CEP, Long numero, String cidade, boolean isPrincipal, Person pessoa) {
+    public Address(String logradouro, Long cep, Long numero, String cidade, boolean isPrincipal) {
         this.logradouro = logradouro;
-        this.CEP = CEP;
+        this.cep = cep;
         this.numero = numero;
         this.cidade = cidade;
         this.isPrincipal = isPrincipal;
-        this.pessoa = pessoa;
     }
 
     public Address() {
@@ -37,12 +35,12 @@ public class Address {
         this.logradouro = logradouro;
     }
 
-    public Long getCEP() {
-        return CEP;
+    public Long getCep() {
+        return cep;
     }
 
-    public void setCEP(Long CEP) {
-        this.CEP = CEP;
+    public void setCep(Long cep) {
+        this.cep = cep;
     }
 
     public Long getNumero() {
@@ -69,11 +67,15 @@ public class Address {
         isPrincipal = principal;
     }
 
-    public Person getPessoa() {
-        return pessoa;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Address address)) return false;
+        return isPrincipal == address.isPrincipal && Objects.equals(getLogradouro(), address.getLogradouro()) && Objects.equals(getCep(), address.getCep()) && Objects.equals(getNumero(), address.getNumero()) && Objects.equals(getCidade(), address.getCidade());
     }
 
-    public void setPessoa(Person pessoa) {
-        this.pessoa = pessoa;
+    @Override
+    public int hashCode() {
+        return Objects.hash(getLogradouro(), getCep(), getNumero(), getCidade(), isPrincipal);
     }
 }
