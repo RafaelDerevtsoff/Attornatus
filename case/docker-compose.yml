@@ -1,6 +1,6 @@
 services:
   case:
-    image: leafard/attornatus:3.0
+    image: leafard/attornatus:4.0
     container_name: case
     ports:
       - 8080:8080
