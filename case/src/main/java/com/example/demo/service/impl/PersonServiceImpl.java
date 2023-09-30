@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
@@ -70,8 +72,8 @@ public class PersonServiceImpl implements PersonService {
                     Optional<Person> personFromRepository = repository.findByEmail(email);
                     if (personFromRepository.isPresent()) return findAndUpdateCache(personFromRepository.get(), ops, methodName);
                     throw new PersonNotFoundException("Person not found");
-                });
-//                .onErrorReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response("User not found", null)));
+                })
+                .onErrorReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response("User not found", null)));
     }
 
 
@@ -84,13 +86,13 @@ public class PersonServiceImpl implements PersonService {
         old.setNome(up.getNome());
         old.setDataDeNascimento(up.getDataDeNascimento());
         Response response = new Response("User Updated", repository.save(old));
-        ops.set(up.getEmail(), up);
+        ops.set(up.getEmail(), up, Duration.of(15L, ChronoUnit.MINUTES));
         LOGGER.info("[{}] - User updated with success: {}", methodName, response.getData());
         return ResponseEntity.ok().body(response);
     }
     private static ResponseEntity<Response> findAndUpdateCache(Person person, ValueOperations<String, Person> ops, String methodName) {
         Response response = new Response("User found", person);
-        ops.set(person.getEmail(), person);
+        ops.set(person.getEmail(), person,Duration.of(15L, ChronoUnit.MINUTES));
         LOGGER.info("[{}] - User found with success: {}", methodName, response.getData());
         return ResponseEntity.ok(response);
     }

@@ -10,3 +10,6 @@ spring:
   jpa:
     spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
+redis:
+  host: ${REDISHOST:0.0.0.0}
+  port: ${REDISPORT:6379}
