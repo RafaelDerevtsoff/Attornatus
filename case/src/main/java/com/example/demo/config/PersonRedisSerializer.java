@@ -47,7 +47,11 @@ public class PersonRedisSerializer implements RedisSerializer<Person> {
     @Override
     public Person deserialize(byte[] bytes) throws SerializationException {
         try {
-            return objectMapper.readValue(bytes, Person.class);
+            if (bytes != null) {
+                return objectMapper.readValue(bytes, Person.class);
+            }else{
+                return null;
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

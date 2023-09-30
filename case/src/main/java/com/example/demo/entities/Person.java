@@ -7,14 +7,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 
 @Entity
 @JsonSerialize
 @JsonDeserialize
-public class Person {
+public class Person implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,6 +47,14 @@ public class Person {
         this.nome = nome;
         this.dataDeNascimento = dataDeNascimento;
         this.address = address;
+    }
+
+    public Person(Long id, String nome, LocalDate dataDeNascimento, Set<Address> address, String email) {
+        this.id = id;
+        this.nome = nome;
+        this.dataDeNascimento = dataDeNascimento;
+        this.address = address;
+        this.email = email;
     }
 
     public Long getId() {

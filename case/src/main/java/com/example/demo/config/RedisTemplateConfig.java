@@ -34,18 +34,12 @@ public class RedisTemplateConfig {
         // Add some specific configuration here. Key serializers, etc.
         return template;
     }
-    @Bean
-    public ReactiveKeyCommands keyCommands(ReactiveRedisConnectionFactory reactiveRedisConnectionFactory) {
-        return reactiveRedisConnectionFactory.getReactiveConnection().keyCommands();
-    }
+
 
     @Bean
     public RedisConnectionFactory reactiveRedisConnectionFactory() {
         return new LettuceConnectionFactory("0.0.0.0", 6379);
     }
 
-    @Bean
-    public ReactiveStringCommands stringCommands(ReactiveRedisConnectionFactory reactiveRedisConnectionFactory) {
-        return reactiveRedisConnectionFactory.getReactiveConnection().stringCommands();
-    }
+
 }
