@@ -11,10 +11,14 @@ import com.example.demo.service.AddressService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 
@@ -22,17 +26,19 @@ import java.util.Set;
 public class AddressServiceImpl implements AddressService {
     @Autowired
     private PersonRepository repository;
-    private StringRedisTemplate redisTemplate;
     private static final Logger LOGGER = LoggerFactory.getLogger(AddressServiceImpl.class);
+    @Autowired
+    private RedisTemplate<String, Person> redisTemplate;
 
     @Override
     public Mono<Response> createAddress(String email, Address address) {
+        ValueOperations<String, Person> ops = redisTemplate.opsForValue();
         String methodName = "CREATE ADDRESS";
         return Mono.just(email)
                 .map(e -> {
                     Optional<Person> person = repository.findByEmail(email);
                     if (person.isPresent()) {
-                        validateAddress(person.get(), address);
+                        validateAddress(person.get(), address,ops);
                         return new Response("Address created", address);
                     } else {
                         throw new PersonNotFoundException("Unable to find person");
@@ -40,7 +46,7 @@ public class AddressServiceImpl implements AddressService {
                 });
     }
 
-    private void validateAddress(Person person, Address address) {
+    private void validateAddress(Person person, Address address,ValueOperations<String,Person> ops) {
         String methodName = "VALIDATE ADDRESS";
         Set<Address> addresses = person.getAddress();
         boolean isUniqueUsed = isUniqueUsed(addresses);
@@ -49,6 +55,7 @@ public class AddressServiceImpl implements AddressService {
         } else {
             addresses.add(address);
             repository.save(person);
+            ops.set(person.getEmail(),person, Duration.of(15L, ChronoUnit.MINUTES));
             LOGGER.info("[{}]Address created", methodName);
         }
     }

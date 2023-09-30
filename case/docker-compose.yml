@@ -1,0 +1,14 @@
+services:
+  case:
+    image: leafard/attornatus:3.0
+    container_name: case
+    ports:
+      - 8080:8080
+    environment:
+      REDISHOST: redis
+      REDISPORT: 6379
+  redis:
+    image: redis/redis-stack-server
+    container_name: redis
+    ports:
+      - 6379:6379
